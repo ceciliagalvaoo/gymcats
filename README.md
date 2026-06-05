@@ -36,6 +36,8 @@ O projeto foi desenvolvido como Atividade Ponderada 4, com o objetivo de constru
 
 A base científica que motivou o GymCats é clara: pesquisadores do British Journal of Sports Medicine acompanharam mais de 6.800 mulheres ativas e constataram que sintomas menstruais afetam diretamente a disponibilidade para treinar (BRUINVELS et al., 2021). Esse impacto varia de mulher para mulher — o que reforça que dados individuais importam mais do que recomendações genéricas (MCNULTY et al., 2020) — e se manifesta desde os primeiros anos de vida esportiva (BROWN et al., 2025). Um app que separa treino de ciclo ignora uma parte relevante da experiência de quem treina.
 
+**Vídeo de demonstração:** [Clique aqui](https://drive.google.com/file/d/195yvhjGhL9X9WgvSRayYuznXIkKpldsB/view?usp=sharing)
+
 ---
 
 ## 2. Problema e motivação
@@ -135,7 +137,7 @@ O projeto segue arquitetura em camadas (Clean Architecture simplificada) com MVV
 │           SymptomsReminderWorker                             │
 │                                                              │
 │  Utils: NotificationHelper  BiometricHelper  ShareHelper     │
-│         ExerciseTranslator  DateUtils                        │
+│         ExerciseTranslator  DateUtils  PasswordSecurity      │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -276,6 +278,12 @@ No desenho inicial, a biometria funcionava como desbloqueio do app, sem estar at
 - `authenticatedAccountIdFlow`: conta logada no momento
 - `lastAccountIdFlow`: última conta usada (para biometria)
 - `biometricAccountIdFlow`: conta vinculada ao sensor biométrico do aparelho
+
+### Hashing de senha
+
+As senhas são armazenadas com PBKDF2WithHmacSHA256 (120.000 iterações, salt aleatório de 16 bytes, chave de 256 bits). O formato gravado no banco é `pbkdf2$iterações$salt_base64$hash_base64`. O `PasswordSecurity.verify()` aceita senhas em texto plano como fallback para compatibilidade com contas criadas antes da migração. O `PasswordSecurity.validateStrength()` exige mínimo de 8 caracteres, letra maiúscula, minúscula e número — a mesma regra é exibida na tela de cadastro antes do campo de confirmação de senha.
+
+O `AccountDao` expõe `updatePassword(accountId, password)` para suportar a troca de senha sem recriar a conta. A tela de login exibe o botão "Esqueci minha senha", que atualmente informa a usuária que a recuperação por código será implementada em passo futuro.
 
 ### Por que local e não remoto
 
@@ -516,6 +524,7 @@ Rodar o backend no WSL nem sempre é suficiente: o processo pode escutar em `127
 | Biometria vinculada à conta | Biometria como desbloqueio do app | Previne contaminação entre contas no mesmo dispositivo |
 | WorkManager com `Configuration.Provider` | Inicialização automática do WorkManager | Necessário para que o Hilt injete dependências nos Workers via `HiltWorkerFactory` |
 | Humor como enum categórico (5 valores) | Escala numérica | Semântica distinta entre categorias — uma média de humor não faz sentido |
+| PBKDF2WithHmacSHA256 para senhas | Texto plano / MD5 | Segurança adequada para dado local sem overhead de servidor; fallback de texto plano garante compatibilidade com contas antigas |
 
 ---
 
@@ -624,6 +633,12 @@ Para rodar os testes unitários:
 .\gradlew.bat test
 ```
 
+Para rodar o teste instrumented (com emulador ou dispositivo conectado via USB com depuração ativada):
+```
+.\gradlew.bat connectedAndroidTest
+```
+O resultado fica em `app/build/reports/androidTests/connected/index.html`.
+
 ---
 
 ## 21. Checklist de requisitos
@@ -643,6 +658,7 @@ Para rodar os testes unitários:
 | Tratamento de erros | ✅ | Estados de loading/error nos ViewModels, feedback visual nas telas |
 | Documentação mínima | ✅ | Este README |
 | Código-fonte em repositório | ✅ | Repositório público |
+| Vídeo de demonstração | ✅ | [Clique aqui](https://drive.google.com/file/d/195yvhjGhL9X9WgvSRayYuznXIkKpldsB/view?usp=sharing) |
 
 ---
 
@@ -654,7 +670,7 @@ O GymCats foi construído como uma solução integrada entre treino e ciclo mens
 
 As decisões de produto e de engenharia seguiram a mesma linha: privilegiar o que faria sentido para a usuária final e manter a arquitetura suficientemente organizada para crescer sem fragilidade. Ao longo do desenvolvimento, vários ajustes foram necessários — separar login de perfil, tornar a biometria coerente com múltiplas contas, resolver a rede entre backend e celular físico, corrigir persistência de fotos, refinar o papel da home, consolidar a tela de progresso como espaço analítico e introduzir migrações de banco para preservar dados.
 
-O resultado é um app funcional com backend de apoio, arquitetura clara em camadas, persistência local consistente e fluxo de treino conectado ao ciclo. A experiência de desenvolvimento reforçou que decisões de modelagem — como gravar a fase do ciclo como snapshot, vincular biometria à conta ou separar humor como categórico — têm impacto direto na qualidade dos dados gerados e na coerência do produto ao longo do tempo. Ainda há espaço para amadurecer autenticação remota, recuperação de senha, testes de UI mais profundos e refinamentos visuais, mas a solução já entrega um recorte completo do problema que se propôs a resolver.
+O resultado é um app funcional com backend de apoio, arquitetura clara em camadas, persistência local consistente e fluxo de treino conectado ao ciclo. A experiência de desenvolvimento reforçou que decisões de modelagem — como gravar a fase do ciclo como snapshot, vincular biometria à conta ou separar humor como categórico — têm impacto direto na qualidade dos dados gerados e na coerência do produto ao longo do tempo. Ainda há espaço para amadurecer autenticação remota, implementar o fluxo completo de recuperação de senha por código, aprofundar testes de UI e refinar detalhes visuais, mas a solução já entrega um recorte completo do problema que se propôs a resolver.
 
 ## 23. Referências
 

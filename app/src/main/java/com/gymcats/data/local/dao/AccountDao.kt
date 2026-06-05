@@ -24,6 +24,9 @@ interface AccountDao {
     @Query("SELECT COUNT(*) FROM accounts")
     suspend fun countAccounts(): Int
 
+    @Query("UPDATE accounts SET password = :password WHERE id = :accountId")
+    suspend fun updatePassword(accountId: Long, password: String)
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertAccount(account: Account): Long
 }

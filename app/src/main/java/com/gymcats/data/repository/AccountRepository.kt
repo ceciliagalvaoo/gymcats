@@ -7,6 +7,7 @@ import com.gymcats.data.local.dao.ProgressPhotoDao
 import com.gymcats.data.local.dao.UserProfileDao
 import com.gymcats.data.local.dao.WorkoutDao
 import com.gymcats.data.local.entities.Account
+import com.gymcats.util.PasswordSecurity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -22,6 +23,8 @@ class AccountRepository @Inject constructor(
     private val cycleLogDao: CycleLogDao,
     private val progressPhotoDao: ProgressPhotoDao
 ) {
+    private val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
+
     val biometricAccountFlow: Flow<Account?> = sessionManager.biometricAccountIdFlow.flatMapLatest { accountId ->
         if (accountId == null) flowOf(null) else dao.getAccount(accountId)
     }
@@ -36,16 +39,17 @@ class AccountRepository @Inject constructor(
         val normalizedPhone = phone.filter { it.isDigit() }
 
         require(normalizedEmail.isNotBlank()) { "Informe seu email." }
-        require(normalizedPhone.isNotBlank()) { "Informe seu numero." }
-        require(password.length >= 6) { "A senha precisa ter ao menos 6 caracteres." }
-        require(dao.getByEmail(normalizedEmail) == null) { "Esse email ja esta cadastrado." }
-        require(dao.getByPhone(normalizedPhone) == null) { "Esse numero ja esta cadastrado." }
+        require(emailRegex.matches(normalizedEmail)) { "Informe um email válido." }
+        require(normalizedPhone.isNotBlank()) { "Informe seu número." }
+        PasswordSecurity.validateStrength(password)?.let { throw IllegalArgumentException(it) }
+        require(dao.getByEmail(normalizedEmail) == null) { "Esse email já está cadastrado." }
+        require(dao.getByPhone(normalizedPhone) == null) { "Esse número já está cadastrado." }
 
         val accountId = dao.insertAccount(
             Account(
                 email = normalizedEmail,
                 phone = normalizedPhone,
-                password = password
+                password = PasswordSecurity.hash(password)
             )
         )
         if (isFirstAccount) {
@@ -66,18 +70,21 @@ class AccountRepository @Inject constructor(
             dao.getByEmail(normalizedEmail)
         } else {
             dao.getByPhone(normalizedPhone)
-        }) ?: throw IllegalArgumentException("Conta nÃ£o encontrada.")
+        }) ?: throw IllegalArgumentException("Conta não encontrada.")
 
-        require(account.password == password) { "Senha incorreta." }
+        require(PasswordSecurity.verify(password, account.password)) { "Senha incorreta." }
+        if (!PasswordSecurity.isHashed(account.password)) {
+            dao.updatePassword(account.id, PasswordSecurity.hash(password))
+        }
         sessionManager.onManualLogin(account.id)
         account
     }
 
     suspend fun loginWithBiometric(): Result<Account> = runCatching {
         val accountId = sessionManager.getBiometricAccountId()
-            ?: throw IllegalStateException("Nenhuma conta biomÃ©trica disponÃ­vel.")
+            ?: throw IllegalStateException("Nenhuma conta biométrica disponível.")
         val account = dao.getAccountNow(accountId)
-            ?: throw IllegalStateException("Conta biomÃ©trica nÃ£o encontrada.")
+            ?: throw IllegalStateException("Conta biométrica não encontrada.")
         sessionManager.onBiometricLogin(account.id)
         account
     }
@@ -91,4 +98,3 @@ class AccountRepository @Inject constructor(
         sessionManager.logout()
     }
 }
-

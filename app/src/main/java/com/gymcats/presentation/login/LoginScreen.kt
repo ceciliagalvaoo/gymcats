@@ -182,6 +182,12 @@ fun LoginScreen(onAuthenticated: (String) -> Unit) {
                 )
 
                 if (uiState.isRegisterMode) {
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        text = "A senha deve ter 8+ caracteres, com maiúscula, minúscula e número.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                     Spacer(Modifier.height(8.dp))
                     OutlinedTextField(
                         value = uiState.confirmPassword,
