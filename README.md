@@ -40,7 +40,7 @@ O projeto foi desenvolvido como Atividade Ponderada 4, com o objetivo de constru
 
 A base científica que motivou o GymCats é clara: pesquisadores do British Journal of Sports Medicine acompanharam mais de 6.800 mulheres ativas e constataram que sintomas menstruais afetam diretamente a disponibilidade para treinar (BRUINVELS et al., 2021). Esse impacto varia de mulher para mulher — o que reforça que dados individuais importam mais do que recomendações genéricas (MCNULTY et al., 2020) — e se manifesta desde os primeiros anos de vida esportiva (BROWN et al., 2025). Um app que separa treino de ciclo ignora uma parte relevante da experiência de quem treina.
 
-**Vídeo de demonstração:** [Clique aqui](https://drive.google.com/file/d/195yvhjGhL9X9WgvSRayYuznXIkKpldsB/view?usp=sharing)
+**Vídeo de demonstração:** [Clique aqui](https://drive.google.com/file/d/15tOR8L0uVMOAFjCOQ6wJCzWuiZUyHzTV/view?usp=sharing)
 
 ---
 
@@ -687,7 +687,7 @@ O resultado fica em `app/build/reports/androidTests/connected/index.html`.
 | Tratamento de erros | ✅ | Estados de loading/error nos ViewModels, feedback visual nas telas |
 | Documentação mínima | ✅ | Este README |
 | Código-fonte em repositório | ✅ | Repositório público |
-| Vídeo de demonstração | ✅ | [Clique aqui](https://drive.google.com/file/d/195yvhjGhL9X9WgvSRayYuznXIkKpldsB/view?usp=sharing) |
+| Vídeo de demonstração | ✅ | [Clique aqui](https://drive.google.com/file/d/15tOR8L0uVMOAFjCOQ6wJCzWuiZUyHzTV/view?usp=sharing) |
 
 ---
 
