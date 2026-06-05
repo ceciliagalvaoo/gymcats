@@ -458,6 +458,10 @@ O app implementa três tipos de lembrete via WorkManager:
 
 Canal único `"GymCats"` com importância `IMPORTANCE_HIGH`. A importância não pode ser alterada após o primeiro registro do canal no sistema — se o canal for recriado com importância menor, o Android mantém a configuração original.
 
+### Simulação de notificação
+
+A tela de perfil expõe um botão "Simular notificação" que chama `NotificationHelper.send()` diretamente com uma mensagem de teste, sem depender do WorkManager. Útil para verificar se o canal está configurado corretamente e se as permissões de notificação foram concedidas no dispositivo.
+
 ### Problema encontrado: notificação na bandeja sem pop-up
 
 Em alguns dispositivos, notificações com importância padrão iam direto para a bandeja sem exibir pop-up. O ajuste foi aumentar a importância do canal para `IMPORTANCE_HIGH` e adicionar `setPriority(NotificationCompat.PRIORITY_HIGH)` no builder. Ambos são necessários: o canal define o teto de importância do sistema, e o builder define a prioridade individual da notificação.
