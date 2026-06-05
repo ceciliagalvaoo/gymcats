@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.gymcats.data.local.entities.CycleLog
 import com.gymcats.data.repository.CycleRepository
 import com.gymcats.data.repository.UserRepository
+import com.gymcats.data.repository.WorkoutRepository
 import com.gymcats.domain.model.CyclePhase
 import com.gymcats.domain.usecase.GetCyclePhaseUseCase
 import com.gymcats.util.DateUtils
@@ -36,6 +37,7 @@ data class CycleLogUiState(
 class CycleLogViewModel @Inject constructor(
     private val cycleRepository: CycleRepository,
     private val userRepository: UserRepository,
+    private val workoutRepository: WorkoutRepository,
     private val getCyclePhaseUseCase: GetCyclePhaseUseCase
 ) : ViewModel() {
 
@@ -56,14 +58,20 @@ class CycleLogViewModel @Inject constructor(
     fun setEnergy(value: Int) = update { copy(energyLevel = value) }
     fun setDisposition(value: Int) = update { copy(disposition = value) }
     fun setCramps(value: Boolean) = update { copy(cramps = value) }
-    fun setMood(value: String) = update { copy(mood = value) }
+    fun setMood(value: String) = update { copy(mood = value, error = null) }
     fun setSleep(value: Int) = update { copy(sleepQuality = value) }
     fun setNotes(value: String) = update { copy(notes = value) }
 
-    fun save() {
+    fun save(workoutId: Long, startTimeMs: Long) {
+        if (_uiState.value.mood.isBlank()) {
+            update { copy(error = "Selecione um humor antes de continuar.") }
+            return
+        }
         viewModelScope.launch {
             update { copy(isSaving = true) }
             val s = _uiState.value
+            val durationMinutes = ((System.currentTimeMillis() - startTimeMs) / 60_000).toInt()
+            workoutRepository.closeWorkoutById(workoutId, durationMinutes)
             val log = CycleLog(
                 date = DateUtils.today(),
                 energyLevel = s.energyLevel,

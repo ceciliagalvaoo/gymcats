@@ -300,13 +300,24 @@ O fluxo de treino é o núcleo operacional do app.
 ### Ciclo de vida de um treino
 
 1. A usuária informa o nome do treino e o inicia. O app cria uma entidade `Workout` com `isOpen = true`, a data atual e a fase do ciclo calculada no momento.
-2. Durante o treino, a usuária adiciona exercícios — manualmente ou via busca na API. O timer conta o tempo decorrido desde a criação.
-3. Ao fechar o treino, o app calcula `durationMinutes`, seta `isOpen = false` e navega para o CycleLog.
-4. Após o CycleLog, o app oferece captura de foto antes de retornar à home.
+2. Durante o treino, a usuária adiciona exercícios — manualmente ou via busca na API. O timer conta o tempo decorrido desde o início.
+3. Ao tocar em "Encerrar treino", o app navega para o CycleLog sem fechar o treino no banco e sem parar o timer. Se a usuária voltar do CycleLog, o treino ainda está aberto e o timer segue contando.
+4. Ao salvar o CycleLog, o app computa `durationMinutes` a partir do instante real de salvamento, fecha o treino (`isOpen = false`) e salva o registro de sintomas.
+5. Após o CycleLog, o app oferece captura de foto antes de retornar à home.
+
+### Timer
+
+O timer roda no `WorkoutViewModel` desde o momento em que o treino é iniciado. Ele só para quando o CycleLog é salvo — não quando "Encerrar treino" é tocado. Isso garante que o tempo registrado reflita a duração total da sessão, incluindo o tempo gasto preenchendo os sintomas ou voltando para adicionar mais exercícios.
+
+O `startTimeMs` é capturado ao iniciar o treino e passado como parâmetro de rota até o CycleLog. Ao salvar, a duração é calculada como `(System.currentTimeMillis() - startTimeMs) / 60.000`.
 
 ### Adição de exercícios via API
 
 Quando a usuária seleciona um exercício da API, o app não o salva imediatamente. Ele abre o formulário de adição com os campos de nome e grupo muscular pré-preenchidos, mas séries, reps e carga ficam em branco para preenchimento. Isso evita que exercícios sejam gravados com carga `0.0` e distorçam os gráficos de progressão. Só após confirmar os valores o exercício é persistido como `ExerciseLog`.
+
+### Adição manual de exercícios e normalização de nome
+
+A usuária pode digitar o nome do exercício livremente, sem usar a API. Para garantir que registros do mesmo exercício em treinos diferentes sejam agrupados corretamente na tela de progressão, o nome é normalizado antes de ser salvo: espaços extras são removidos e a primeira letra é convertida para maiúsculo com o restante em minúsculo (`trim().lowercase().replaceFirstChar { uppercase }`). Assim, "agachamento", "Agachamento" e "AGACHAMENTO" geram o mesmo nome no banco e se comportam como o mesmo exercício nas análises.
 
 ### Por que `cyclePhase` é armazenada no `Workout`
 

@@ -6,8 +6,8 @@ sealed class Screen(val route: String) {
     object Home : Screen("home")
     object About : Screen("about")
     object Workout : Screen("workout")
-    object CycleLog : Screen("cyclelog/{workoutId}") {
-        fun createRoute(workoutId: Long) = "cyclelog/$workoutId"
+    object CycleLog : Screen("cyclelog/{workoutId}/{startTimeMs}") {
+        fun createRoute(workoutId: Long, startTimeMs: Long) = "cyclelog/$workoutId/$startTimeMs"
     }
     object PhotoCapture : Screen("photo/{workoutId}") {
         fun createRoute(workoutId: Long) = "photo/$workoutId"

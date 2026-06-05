@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
@@ -48,7 +47,7 @@ import com.gymcats.data.local.entities.ExerciseLog
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutScreen(
-    onWorkoutClosed: (Long) -> Unit,
+    onWorkoutClosed: (workoutId: Long, startTimeMs: Long) -> Unit,
     onBack: () -> Unit
 ) {
     val viewModel: WorkoutViewModel = hiltViewModel()
@@ -62,13 +61,13 @@ fun WorkoutScreen(
     var draftExerciseEntry by remember { mutableStateOf(ExerciseEntry(exerciseName = "")) }
 
     LaunchedEffect(uiState.workout) {
-        if (uiState.workout == null) showStartDialog = true
+        if (uiState.workout == null && !uiState.workoutCancelled) showStartDialog = true
     }
 
     LaunchedEffect(uiState.closedWorkoutId) {
         uiState.closedWorkoutId?.let {
             viewModel.clearClosedWorkoutId()
-            onWorkoutClosed(it)
+            onWorkoutClosed(it, uiState.closedStartTimeMs)
         }
     }
 
@@ -197,12 +196,7 @@ fun WorkoutScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(uiState.workout?.name ?: "Treino") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Filled.ArrowBack, "Voltar")
-                    }
-                }
+                title = { Text(uiState.workout?.name ?: "Treino") }
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }

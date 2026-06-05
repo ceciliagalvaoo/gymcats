@@ -25,6 +25,9 @@ interface WorkoutDao {
     @Query("SELECT AVG(durationMinutes) FROM workouts WHERE accountId = :accountId AND date LIKE :month || '%' AND isOpen = 0")
     fun avgDurationInMonth(accountId: Long, month: String): Flow<Float?>
 
+    @Query("SELECT * FROM workouts WHERE id = :id LIMIT 1")
+    suspend fun getWorkoutById(id: Long): Workout?
+
     @Query("SELECT * FROM workouts WHERE accountId = :accountId AND isOpen = 0 ORDER BY date DESC, id DESC LIMIT 1")
     fun getLastClosedWorkout(accountId: Long): Flow<Workout?>
 

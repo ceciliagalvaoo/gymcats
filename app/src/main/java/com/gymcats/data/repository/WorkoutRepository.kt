@@ -63,4 +63,9 @@ class WorkoutRepository @Inject constructor(
     suspend fun closeWorkout(workout: Workout, durationMinutes: Int) {
         workoutDao.updateWorkout(workout.copy(isOpen = false, durationMinutes = durationMinutes))
     }
+
+    suspend fun closeWorkoutById(workoutId: Long, durationMinutes: Int) {
+        val workout = workoutDao.getWorkoutById(workoutId) ?: return
+        workoutDao.updateWorkout(workout.copy(isOpen = false, durationMinutes = durationMinutes))
+    }
 }

@@ -40,6 +40,7 @@ data class WorkoutUiState(
     val showExerciseSelector: Boolean = false,
     val workoutCancelled: Boolean = false,
     val closedWorkoutId: Long? = null,
+    val closedStartTimeMs: Long = 0L,
     // Exercise selector state
     val searchQuery: String = "",
     val searchResults: List<ExerciseResponse> = emptyList(),
@@ -120,7 +121,7 @@ class WorkoutViewModel @Inject constructor(
             val workoutId = _uiState.value.workout?.id ?: return@launch
             val log = ExerciseLog(
                 workoutId = workoutId,
-                exerciseName = entry.exerciseName,
+                exerciseName = entry.exerciseName.trim().lowercase().replaceFirstChar { it.uppercaseChar() },
                 exerciseApiId = entry.exerciseApiId,
                 muscleGroup = entry.muscleGroup,
                 sets = entry.sets.toIntOrNull() ?: 1,
@@ -135,7 +136,7 @@ class WorkoutViewModel @Inject constructor(
         viewModelScope.launch {
             workoutRepository.updateExerciseInWorkout(
                 log.copy(
-                    exerciseName = entry.exerciseName,
+                    exerciseName = entry.exerciseName.trim().lowercase().replaceFirstChar { it.uppercaseChar() },
                     exerciseApiId = entry.exerciseApiId,
                     muscleGroup = entry.muscleGroup,
                     sets = entry.sets.toIntOrNull() ?: 1,
@@ -156,12 +157,10 @@ class WorkoutViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(error = "Adicione ao menos um exercício antes de encerrar.")
             return
         }
-        viewModelScope.launch {
-            val duration = (_uiState.value.elapsedSeconds / 60).toInt()
-            workoutRepository.closeWorkout(workout, duration)
-            timerJob?.cancel()
-            _uiState.value = _uiState.value.copy(closedWorkoutId = workout.id)
-        }
+        _uiState.value = _uiState.value.copy(
+            closedWorkoutId = workout.id,
+            closedStartTimeMs = startTimeMs
+        )
     }
 
     fun cancelWorkout() {

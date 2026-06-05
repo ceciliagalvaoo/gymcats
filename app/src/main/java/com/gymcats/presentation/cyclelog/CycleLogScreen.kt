@@ -12,9 +12,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -33,7 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun CycleLogScreen(workoutId: Long, onSaved: () -> Unit) {
+fun CycleLogScreen(workoutId: Long, startTimeMs: Long, onSaved: () -> Unit, onBack: () -> Unit) {
     val viewModel: CycleLogViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -42,7 +46,16 @@ fun CycleLogScreen(workoutId: Long, onSaved: () -> Unit) {
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Como você se sentiu hoje?") }) }
+        topBar = {
+            TopAppBar(
+                title = { Text("Como você se sentiu hoje?") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
+                    }
+                }
+            )
+        }
     ) { padding ->
         Column(
             Modifier
@@ -71,7 +84,7 @@ fun CycleLogScreen(workoutId: Long, onSaved: () -> Unit) {
                 Switch(checked = uiState.cramps, onCheckedChange = { viewModel.setCramps(it) })
             }
 
-            Text("Humor", style = MaterialTheme.typography.bodyMedium)
+            Text("Humor")
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -85,6 +98,13 @@ fun CycleLogScreen(workoutId: Long, onSaved: () -> Unit) {
                     )
                 }
             }
+            if (uiState.error != null) {
+                Text(
+                    text = uiState.error!!,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
 
             OutlinedTextField(
                 value = uiState.notes,
@@ -96,7 +116,7 @@ fun CycleLogScreen(workoutId: Long, onSaved: () -> Unit) {
 
             Spacer(Modifier.height(8.dp))
             Button(
-                onClick = { viewModel.save() },
+                onClick = { viewModel.save(workoutId, startTimeMs) },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !uiState.isSaving
             ) {

@@ -42,20 +42,26 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
         }
         composable(Screen.Workout.route) {
             WorkoutScreen(
-                onWorkoutClosed = { workoutId ->
-                    navController.navigate(Screen.CycleLog.createRoute(workoutId))
+                onWorkoutClosed = { workoutId, startTimeMs ->
+                    navController.navigate(Screen.CycleLog.createRoute(workoutId, startTimeMs))
                 },
                 onBack = { navController.popBackStack() }
             )
         }
         composable(
             route = Screen.CycleLog.route,
-            arguments = listOf(navArgument("workoutId") { type = NavType.LongType })
+            arguments = listOf(
+                navArgument("workoutId") { type = NavType.LongType },
+                navArgument("startTimeMs") { type = NavType.LongType }
+            )
         ) {
             val workoutId = it.arguments?.getLong("workoutId") ?: 0L
+            val startTimeMs = it.arguments?.getLong("startTimeMs") ?: System.currentTimeMillis()
             CycleLogScreen(
                 workoutId = workoutId,
-                onSaved = { navController.navigate(Screen.PhotoCapture.createRoute(workoutId)) }
+                startTimeMs = startTimeMs,
+                onSaved = { navController.navigate(Screen.PhotoCapture.createRoute(workoutId)) },
+                onBack = { navController.popBackStack() }
             )
         }
         composable(
