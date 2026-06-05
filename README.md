@@ -546,6 +546,12 @@ Rodar o backend no WSL nem sempre é suficiente: o processo pode escutar em `127
 
 A arquitetura inicial assumia uma única usuária por dispositivo. Quando surgiu a necessidade de múltiplas contas — para testes com usuários diferentes e demo da aplicação — foi necessário criar a tabela `accounts`, adicionar `accountId` em todas as tabelas existentes, escrever migrações que preservassem os dados de quem já usava o app, reorganizar a biometria para ser por conta e não por dispositivo, e revisar toda a lógica de sessão. Foi a mudança de maior impacto no projeto.
 
+### Emulador lento e instalação via USB sem chip
+
+O emulador Android travava com frequência durante o desenvolvimento, atrasando ciclos de build e teste de forma significativa. A solução natural era usar um dispositivo físico — mas o aparelho disponível não tinha chip. Ao tentar habilitar a instalação via USB pelo app de **Configurações** do Android, o sistema exibia uma mensagem informando que a opção só podia ser ativada com um chip inserido, bloqueando o caminho convencional.
+
+Após pesquisa em fóruns, foi descoberto que o app de **Segurança** do Android — separado do app de Configurações — expõe a mesma opção sem exigir chip. Acessando por ali, foi possível habilitar a instalação via USB normalmente. Esse comportamento não está documentado oficialmente e só foi encontrado por relatos de outros usuários em situação semelhante. A partir disso, o celular físico passou a ser o ambiente principal de testes, tornando o desenvolvimento consideravelmente mais ágil.
+
 ### Backend acessível no celular físico
 
 O emulador Android aceita `10.0.2.2` como alias para o host. O celular físico não. Descobrir isso durante o desenvolvimento foi frustrante: o app funcionava no emulador e parava de funcionar assim que conectado ao celular real. A solução — URL configurável via `gradle.properties` — é simples, mas chegar lá exigiu entender a interação entre WSL2, firewall do Windows e a rede local.
