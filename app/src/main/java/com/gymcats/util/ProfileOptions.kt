@@ -1,5 +1,5 @@
 package com.gymcats.util
 
 object ProfileOptions {
-    val goals = listOf("Hipertrofia", "Forca", "Saude", "Emagrecimento")
+    val goals = listOf("Hipertrofia", "Força", "Saúde", "Emagrecimento")
 }
