@@ -153,7 +153,7 @@ O `WorkManager` foi configurado manualmente via `Configuration.Provider` no `Gym
 
 ## 6. Banco de dados local
 
-Room versão 3. Seis entidades com relações de chave estrangeira:
+Room versão 2. Seis entidades com relações de chave estrangeira:
 
 ```
 accounts
@@ -217,8 +217,6 @@ progress_photos
 ### Migrações
 
 **1 → 2 (principal):** o fluxo foi projetado inicialmente para uma única usuária por aparelho. Quando surgiu a necessidade de suportar múltiplas contas no mesmo dispositivo — para testes, demo e casos reais de compartilhamento — foi necessário criar a tabela `accounts`, adicionar `accountId` em todas as tabelas e reestruturar `user_profile` para usar `accountId` como chave primária. Dados preexistentes foram vinculados à primeira conta criada para não perder histórico.
-
-**2 → 3 (limpeza):** limpeza do campo `notes` em registros de fotos criados por seed de debug, alinhando o banco ao comportamento atual do produto.
 
 ---
 
@@ -464,9 +462,15 @@ Em alguns dispositivos, notificações com importância padrão iam direto para 
 
 ## 15. Compartilhamento
 
-O `ShareHelper` usa a intent nativa `Intent.ACTION_SEND` com `type = "text/plain"`. O texto compartilhado é gerado pela `ProgressViewModel` a partir das métricas do período selecionado e inclui total de treinos, energia média, disposição, sono, duração e resumo de fase. O sistema operacional exibe o chooser nativo, deixando a usuária escolher o app de destino.
+O `ShareHelper` usa a intent nativa `Intent.ACTION_SEND` com `type = "text/plain"`. O sistema operacional exibe o chooser nativo, deixando a usuária escolher o app de destino (WhatsApp, email, etc.), sem dependência de SDK de terceiros.
 
-Isso atende ao requisito de compartilhamento usando o recurso nativo do sistema, sem dependência de SDK de terceiros.
+O texto gerado contém:
+
+- **Período** — rótulo do filtro selecionado (1, 3 ou 6 meses)
+- **Treinos realizados** — total de treinos no período
+- **Exercício mais frequente** — nome do exercício com mais registros
+- **Energia média** — média dos cycle_logs no período, em escala de 1 a 5
+- **Exercício que mais evoluiu carga** — nome do exercício com maior ganho de peso entre a primeira e a última sessão do período
 
 ---
 
