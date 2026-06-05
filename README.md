@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="logo_gymcats.png" width="120" alt="GymCats logo" />
+</p>
+
 # GymCats
 
 ## Sumário
@@ -68,7 +72,7 @@ O app exibe a fase atual do ciclo (menstrual, folicular, ovulatória, lútea) co
 | **Jetpack Compose + Material 3** | UI declarativa, menos boilerplate, integração nativa com ViewModel e StateFlow |
 | **Navigation Compose** | Navegação tipada com backstack gerenciado, compatível com Hilt |
 | **Hilt** | DI por anotação, integração com ViewModel e WorkManager, reduz acoplamento entre camadas |
-| **Room (v3)** | ORM Android com suporte a migrações explícitas, queries assíncronas com Flow e suporte multi-conta |
+| **Room (v2)** | ORM Android com suporte a migrações explícitas, queries assíncronas com Flow e suporte multi-conta |
 | **DataStore** | Preferências e estado de sessão que não são domínio — separado do Room intencionalmente |
 | **WorkManager** | Tarefas em background que sobrevivem ao processo ser encerrado, ideal para notificações de ciclo e treino |
 | **Retrofit + OkHttp** | HTTP declarativo, interceptor para JWT automático, logging para debug |
@@ -118,7 +122,7 @@ O projeto segue arquitetura em camadas (Clean Architecture simplificada) com MVV
 │    WorkoutRepository   AccountRepository   UserRepository    │
 │    CycleRepository     ExerciseRepository  ProgressRepository│
 │                                                              │
-│  LOCAL (Room v3)          REMOTE (Retrofit)                  │
+│  LOCAL (Room v2)          REMOTE (Retrofit)                  │
 │    AccountDao               GymCatsApi (interface)           │
 │    UserProfileDao           ExerciseRemoteDataSource         │
 │    WorkoutDao               AuthInterceptor (OkHttp)         │
@@ -653,7 +657,7 @@ O resultado fica em `app/build/reports/androidTests/connected/index.html`.
 | Mais de duas telas | ✅ | 9 telas: Login, Onboarding, Home, Workout, CycleLog, PhotoCapture, Progress, ExerciseProgression, Profile |
 | Navegação funcional | ✅ | Navigation Compose com NavGraph tipado |
 | Backend funcional | ✅ | FastAPI com endpoints de exercícios e autenticação por JWT |
-| Banco de dados | ✅ | Room v3 local com 6 entidades e migrações explícitas |
+| Banco de dados | ✅ | Room v2 local com 6 entidades e migrações explícitas |
 | API externa | ✅ | ExerciseDB (RapidAPI) — busca, filtro e detalhe de exercícios |
 | Sistema de notificações | ✅ | WorkManager com 3 workers: treino, ciclo e sintomas |
 | Compartilhamento | ✅ | ShareHelper com `Intent.ACTION_SEND` — resumo de progresso |
