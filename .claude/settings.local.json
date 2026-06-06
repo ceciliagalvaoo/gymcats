@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm /mnt/c/Users/Inteli/AndroidStudioProjects/gymcats/app/src/main/java/com/gymcats/data/remote/datasource/ExerciseRemoteDataSource.kt)",
+      "Bash(rm /mnt/c/Users/Inteli/AndroidStudioProjects/gymcats/app/src/main/java/com/gymcats/util/SymptomsReminderWorker.kt)"
+    ]
+  }
+}

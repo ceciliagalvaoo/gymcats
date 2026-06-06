@@ -24,7 +24,7 @@ import com.gymcats.data.local.entities.Workout
         CycleLog::class,
         ProgressPhoto::class
     ],
-    version = 3,
+    version = 5,
     exportSchema = false
 )
 abstract class GymCatsDatabase : RoomDatabase() {

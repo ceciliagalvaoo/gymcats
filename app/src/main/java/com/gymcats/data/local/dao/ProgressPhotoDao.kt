@@ -12,16 +12,17 @@ data class ProgressPhotoWithWorkout(
     val imagePath: String,
     val date: String,
     val workoutId: Long? = null,
-    val notes: String = "",
-    val workoutName: String? = null
+    val workoutName: String? = null,
+    val cycleNotes: String? = null
 )
 
 @Dao
 interface ProgressPhotoDao {
     @Query("""
-        SELECT p.id, p.imagePath, p.date, p.workoutId, p.notes, w.name AS workoutName
+        SELECT p.id, p.imagePath, p.date, p.workoutId, w.name AS workoutName, cl.notes AS cycleNotes
         FROM progress_photos p
         LEFT JOIN workouts w ON p.workoutId = w.id
+        LEFT JOIN cycle_logs cl ON cl.workoutId = p.workoutId
         WHERE p.accountId = :accountId AND p.date >= :fromDate
         ORDER BY p.date DESC, p.id DESC
     """)

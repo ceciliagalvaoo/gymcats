@@ -14,7 +14,8 @@ sealed class Screen(val route: String) {
     }
     object Progress : Screen("progress")
     object ExerciseProgression : Screen("progression/{exerciseName}/{months}") {
-        fun createRoute(name: String, months: Int) = "progression/$name/$months"
+        fun createRoute(name: String, months: Int) =
+            "progression/${android.net.Uri.encode(name)}/$months"
     }
     object Profile : Screen("profile")
 }

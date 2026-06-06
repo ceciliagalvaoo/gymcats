@@ -32,6 +32,50 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
     }
 }
 
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `cycle_logs` ADD COLUMN `workoutId` INTEGER")
+    }
+}
+
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("""
+            CREATE TABLE `workouts_new` (
+                `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `accountId` INTEGER NOT NULL DEFAULT 0,
+                `name` TEXT NOT NULL,
+                `date` TEXT NOT NULL,
+                `durationMinutes` INTEGER NOT NULL,
+                `cyclePhase` TEXT NOT NULL,
+                `isOpen` INTEGER NOT NULL DEFAULT 0
+            )
+        """.trimIndent())
+        db.execSQL("""
+            INSERT INTO `workouts_new` (`id`, `accountId`, `name`, `date`, `durationMinutes`, `cyclePhase`, `isOpen`)
+            SELECT `id`, `accountId`, `name`, `date`, `durationMinutes`, `cyclePhase`, `isOpen` FROM `workouts`
+        """.trimIndent())
+        db.execSQL("DROP TABLE `workouts`")
+        db.execSQL("ALTER TABLE `workouts_new` RENAME TO `workouts`")
+
+        db.execSQL("""
+            CREATE TABLE `progress_photos_new` (
+                `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `accountId` INTEGER NOT NULL DEFAULT 0,
+                `imagePath` TEXT NOT NULL,
+                `date` TEXT NOT NULL,
+                `workoutId` INTEGER
+            )
+        """.trimIndent())
+        db.execSQL("""
+            INSERT INTO `progress_photos_new` (`id`, `accountId`, `imagePath`, `date`, `workoutId`)
+            SELECT `id`, `accountId`, `imagePath`, `date`, `workoutId` FROM `progress_photos`
+        """.trimIndent())
+        db.execSQL("DROP TABLE `progress_photos`")
+        db.execSQL("ALTER TABLE `progress_photos_new` RENAME TO `progress_photos`")
+    }
+}
+
 private fun addColumnIfMissing(
     db: SupportSQLiteDatabase,
     tableName: String,

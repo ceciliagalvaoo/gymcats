@@ -14,5 +14,6 @@ data class CycleLog(
     val cramps: Boolean,
     val sleepQuality: Int,
     val notes: String = "",
-    val cyclePhase: String
+    val cyclePhase: String,
+    val workoutId: Long? = null
 )

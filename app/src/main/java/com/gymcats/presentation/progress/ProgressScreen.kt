@@ -221,6 +221,13 @@ fun ProgressScreen(navController: NavController) {
                                 photo.workoutName?.takeIf { it.isNotBlank() }?.let {
                                     Text(it, style = MaterialTheme.typography.bodyMedium)
                                 }
+                                photo.cycleNotes?.takeIf { it.isNotBlank() }?.let {
+                                    Text(
+                                        it,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                             }
                         }
                     }

@@ -5,6 +5,8 @@ import androidx.room.Room
 import com.gymcats.data.local.database.GymCatsDatabase
 import com.gymcats.data.local.database.MIGRATION_1_2
 import com.gymcats.data.local.database.MIGRATION_2_3
+import com.gymcats.data.local.database.MIGRATION_3_4
+import com.gymcats.data.local.database.MIGRATION_4_5
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,7 +22,7 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): GymCatsDatabase =
         Room.databaseBuilder(context, GymCatsDatabase::class.java, "gymcats.db")
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
             .build()
 
     @Provides fun provideAccountDao(db: GymCatsDatabase) = db.accountDao()

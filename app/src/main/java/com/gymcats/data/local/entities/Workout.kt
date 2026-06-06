@@ -11,6 +11,5 @@ data class Workout(
     val date: String,
     val durationMinutes: Int,
     val cyclePhase: String,
-    val notes: String = "",
     val isOpen: Boolean = false
 )

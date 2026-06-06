@@ -29,13 +29,14 @@ interface ExerciseLogDao {
     fun getDistinctExercises(): Flow<List<String>>
 
     @Query("""
-        SELECT el.exerciseName, el.weight, el.exerciseApiId, w.date
+        SELECT el.exerciseName, MAX(el.weight) AS weight, el.exerciseApiId, w.date
         FROM exercise_logs el
         INNER JOIN workouts w ON el.workoutId = w.id
         WHERE w.accountId = :accountId
         AND el.exerciseName = :exerciseName
         AND w.date >= :fromDate
         AND w.isOpen = 0
+        GROUP BY w.id
         ORDER BY w.date ASC
     """)
     suspend fun getProgressionForExercise(

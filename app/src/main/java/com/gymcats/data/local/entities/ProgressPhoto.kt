@@ -9,6 +9,5 @@ data class ProgressPhoto(
     val accountId: Long = 0,
     val imagePath: String,
     val date: String,
-    val workoutId: Long? = null,
-    val notes: String = ""
+    val workoutId: Long? = null
 )

@@ -184,7 +184,6 @@ workouts
   ├── date (YYYY-MM-DD)
   ├── durationMinutes
   ├── cyclePhase             ← fase no momento da criação
-  ├── notes
   └── isOpen (boolean)
 
 exercise_logs
@@ -207,21 +206,20 @@ cycle_logs
   ├── cramps (boolean)
   ├── sleepQuality (1–5)
   ├── notes
-  └── cyclePhase
+  ├── cyclePhase
+  └── workoutId (nullable, FK → workouts)  ← treino que originou o registro
 
 progress_photos
   ├── id (PK autoincrement)
   ├── accountId (FK → accounts)
   ├── imagePath (caminho absoluto)
   ├── date
-  ├── workoutId (nullable, FK → workouts)
-  └── notes
+  └── workoutId (nullable, FK → workouts)
 ```
 
 ### Migrações
 
 **1 → 2 (principal):** o fluxo foi projetado inicialmente para uma única usuária por aparelho. Quando surgiu a necessidade de suportar múltiplas contas no mesmo dispositivo — para testes, demo e casos reais de compartilhamento — foi necessário criar a tabela `accounts`, adicionar `accountId` em todas as tabelas e reestruturar `user_profile` para usar `accountId` como chave primária. Dados preexistentes foram vinculados à primeira conta criada para não perder histórico.
-
 ---
 
 ## 7. Telas e fluxo de navegação
@@ -443,11 +441,15 @@ A usuária escolhe entre 1, 3 e 6 meses. Todos os dados da tela são recalculado
 | Cólica por fase | Gráfico de barras | Média (0–1) por fase, escala 0–100% |
 | Humor por fase | Barras empilhadas | Distribuição percentual de cada categoria por fase |
 | Progressão por exercício | Lista clicável | Navegação para ExerciseProgressionScreen |
-| Fotos do período | Grade | Fotos com data e treino vinculado |
+| Fotos do período | Grade | Fotos com data, treino vinculado e observação do dia (se preenchida) |
 
 ### ExerciseProgressionScreen
 
-Exibe a evolução de carga (kg) de um exercício ao longo do tempo em gráfico de linhas. A granularidade é por sessão de treino, não por data, porque a mesma data pode ter múltiplas séries com cargas diferentes.
+Exibe a evolução de carga (kg) de um exercício ao longo do tempo em gráfico de linhas. A granularidade é por sessão de treino. Quando o mesmo exercício é realizado mais de uma vez na mesma sessão, é exibido o maior peso registrado — isso evita múltiplos pontos na mesma data e representa o pico de performance daquele dia.
+
+### Observação do dia nas fotos
+
+As fotos de progresso exibem, abaixo do nome do treino, a observação preenchida no CycleLog daquela sessão (campo opcional). O vínculo é direto via `workoutId`: o CycleLog armazena o id do treino que o originou, e a query busca o campo `notes` desse registro específico — sem depender de correspondência por data, o que evitava ambiguidade quando havia mais de um log no mesmo dia.
 
 ### Compartilhamento
 
@@ -463,7 +465,6 @@ O app implementa três tipos de lembrete via WorkManager:
 |---|---|---|
 | `WorkoutReminderWorker` | Horário habitual de treino definido no onboarding | "Hora de registrar seu treino de hoje!" |
 | `CycleReminderWorker` | Véspera da data prevista para a próxima menstruação | "Seu período está previsto para começar amanhã." |
-| `SymptomsReminderWorker` | Após treino sem check-in de sintomas | Lembrete para registrar como se sentiu |
 
 ### Canal de notificação
 
@@ -586,6 +587,10 @@ Apagar e recriar o banco a cada mudança de schema é tentador durante o desenvo
 ### Notificações não aparecendo como pop-up
 
 Notificações com importância padrão iam para a bandeja sem exibir pop-up em vários dispositivos de teste. Descobrir que o canal precisa ser criado com `IMPORTANCE_HIGH` antes do primeiro uso — e que o Android ignora tentativas de alterar a importância de um canal já registrado — tomou tempo de debug.
+
+### Teclado travado no campo de observações
+
+O campo de observações do CycleLog (preenchido ao final de cada treino) não permitia fechar o teclado virtual ao tocar fora dele. A usuária ficava presa na entrada de texto sem conseguir confirmar a ação ou rolar a tela. O comportamento esperado no Android — dispensar o teclado ao tocar fora do campo — não ocorre automaticamente em `Column` com `verticalScroll`. A solução foi adicionar `pointerInput` + `detectTapGestures` na `Column` da tela, chamando `LocalFocusManager.clearFocus()` a cada toque, o que remove o foco do campo e dispensa o teclado.
 
 ### Seed de debug
 

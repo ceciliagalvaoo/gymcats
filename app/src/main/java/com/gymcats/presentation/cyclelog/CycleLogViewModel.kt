@@ -80,7 +80,8 @@ class CycleLogViewModel @Inject constructor(
                 cramps = s.cramps,
                 sleepQuality = s.sleepQuality,
                 notes = s.notes,
-                cyclePhase = s.currentPhase.name
+                cyclePhase = s.currentPhase.name,
+                workoutId = workoutId
             )
             cycleRepository.insertLog(log)
             update { copy(isSaving = false, isSaved = true) }

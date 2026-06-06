@@ -41,18 +41,6 @@ fun scheduleWorkoutReminder(context: Context, days: List<DayOfWeek>, hour: Int) 
     }
 }
 
-fun scheduleSymptomsReminder(context: Context) {
-    val request = OneTimeWorkRequestBuilder<SymptomsReminderWorker>()
-        .setInitialDelay(30, TimeUnit.MINUTES)
-        .addTag("symptoms_reminder")
-        .build()
-    WorkManager.getInstance(context).enqueueUniqueWork(
-        "symptoms_reminder",
-        ExistingWorkPolicy.REPLACE,
-        request
-    )
-}
-
 fun scheduleCycleReminder(context: Context, lastPeriodDate: LocalDate, cycleLength: Int) {
     val nextPeriod = lastPeriodDate.plusDays(cycleLength.toLong())
     val reminderDate = nextPeriod.minusDays(1)

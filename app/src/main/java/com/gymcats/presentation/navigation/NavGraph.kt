@@ -88,7 +88,7 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
                 navArgument("months") { type = NavType.IntType }
             )
         ) {
-            val name = it.arguments?.getString("exerciseName") ?: ""
+            val name = android.net.Uri.decode(it.arguments?.getString("exerciseName") ?: "")
             val months = it.arguments?.getInt("months") ?: 3
             ExerciseProgressionScreen(exerciseName = name, months = months, navController = navController)
         }
