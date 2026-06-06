@@ -244,6 +244,8 @@ progress_photos
                          [Home] ←─────────────────┐
                                                    │
                         [Profile] ─── logout ──→ [Login]
+
+                         [About] ←── acessado pela [Home]
 ```
 
 | Tela | Função |
@@ -257,6 +259,7 @@ progress_photos
 | **Progress** | Analytics históricos: filtros por período, gráficos, fotos, botão de compartilhamento |
 | **ExerciseProgression** | Evolução de carga de um exercício específico ao longo do tempo |
 | **Profile** | Edição de perfil, preferências de treino e ciclo, logout |
+| **About** | Descrição do problema, base científica, solução, funcionalidades e referências bibliográficas |
 
 ---
 
