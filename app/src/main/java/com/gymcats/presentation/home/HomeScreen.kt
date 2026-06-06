@@ -113,7 +113,7 @@ fun HomeScreen(navController: NavController) {
                     Column(Modifier.padding(16.dp)) {
                         Text("Fase atual: ${phase.label}", style = MaterialTheme.typography.titleMedium)
                         Spacer(Modifier.height(4.dp))
-                        Text(phase.tip, style = MaterialTheme.typography.bodyMedium)
+                        Text(uiState.phaseTip ?: "", style = MaterialTheme.typography.bodyMedium)
                     }
                 }
             }

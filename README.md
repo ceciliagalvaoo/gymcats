@@ -58,7 +58,7 @@ O que faltava era um produto que tratasse treino e ciclo como parte do mesmo con
 
 O GymCats organiza treino ativo, registro de sintomas, histórico de evolução de carga e fotos de progresso em um único fluxo. Ao fechar um treino, a usuária registra como se sentiu — energia, disposição, humor, cólica, sono. Ao longo do tempo, a tela de progresso conecta esses registros e permite identificar padrões: em quais fases o rendimento cai, em quais a disposição aumenta, como a carga evoluiu por exercício.
 
-O app exibe a fase atual do ciclo (menstrual, folicular, ovulatória, lútea) com uma dica contextual adaptada àquela fase, e usa essas informações para contextualizar os dados históricos na tela de progresso.
+O app exibe a fase atual do ciclo (menstrual, folicular, ovulatória, lútea) com uma dica contextual personalizada pelo cruzamento da fase com o objetivo da usuária (hipertrofia, força, emagrecimento ou saúde), e usa essas informações para contextualizar os dados históricos na tela de progresso.
 
 ---
 
@@ -368,19 +368,21 @@ A listagem retorna exercícios com nome e grupo muscular em inglês — sem trad
 
 ### Cálculo de fase
 
-`GetCyclePhaseUseCase` calcula a fase a partir de dois dados do perfil: `lastPeriodDate` e `cycleLength`. A lógica é:
+`GetCyclePhaseUseCase` calcula a fase a partir de três dados do perfil: `lastPeriodDate`, `cycleLength` e `periodLength`. A lógica é:
 
 ```
 diasDesdeUltimaMenstruacao = (hoje - lastPeriodDate)
 diaAtualNoCiclo = diasDesdeUltimaMenstruacao % cycleLength + 1
 
-MENSTRUAL    → dias 1–5     "Priorize recuperação e treinos leves."
-FOLICULAR    → dias 6–13    "Boa fase para treinos intensos e novos recordes."
-OVULATÓRIA   → dias 14–16   "Pico de energia, aproveite para treinos pesados."
-LÚTEA        → dias 17+     "Foque em técnica, mobilidade e bem-estar."
+MENSTRUAL    → dias 1–periodLength
+FOLICULAR    → dias (periodLength+1)–13
+OVULATÓRIA   → dias 14–16
+LÚTEA        → dias 17+
 ```
 
-A home exibe a fase atual com a dica correspondente e um aviso quando `lastPeriodDate` está há mais de 60 dias sem atualização.
+A duração da fase menstrual respeita o `periodLength` configurado no onboarding, em vez de usar um valor fixo de 5 dias.
+
+A home exibe a fase atual com uma dica personalizada pelo cruzamento de fase e objetivo da usuária (`cyclePhaseTip(phase, goal)`) e um aviso quando `lastPeriodDate` está há mais de 60 dias sem atualização.
 
 ### Registro de sintomas (CycleLog)
 
@@ -683,7 +685,7 @@ O resultado fica em `app/build/reports/androidTests/connected/index.html`.
 | Requisito | Status | Implementação |
 |---|---|---|
 | Implementação mobile (Kotlin) | ✅ | Android nativo com Kotlin + Jetpack Compose |
-| Mais de duas telas | ✅ | 9 telas: Login, Onboarding, Home, Workout, CycleLog, PhotoCapture, Progress, ExerciseProgression, Profile |
+| Mais de duas telas | ✅ | 10 telas: Login, Onboarding, Home, Workout, CycleLog, PhotoCapture, Progress, ExerciseProgression, Profile, About |
 | Navegação funcional | ✅ | Navigation Compose com NavGraph tipado |
 | Backend funcional | ✅ | FastAPI com endpoints de exercícios e autenticação por JWT |
 | Banco de dados | ✅ | Room v2 local com 6 entidades e migrações explícitas |

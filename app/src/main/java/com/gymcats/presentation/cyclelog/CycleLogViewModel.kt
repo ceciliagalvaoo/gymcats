@@ -48,7 +48,7 @@ class CycleLogViewModel @Inject constructor(
         viewModelScope.launch {
             val profile = userRepository.getProfile().first()
             val phase = profile?.let {
-                try { getCyclePhaseUseCase(LocalDate.parse(it.lastPeriodDate), it.cycleLength) }
+                try { getCyclePhaseUseCase(LocalDate.parse(it.lastPeriodDate), it.cycleLength, it.periodLength) }
                 catch (e: Exception) { CyclePhase.FOLICULAR }
             } ?: CyclePhase.FOLICULAR
             _uiState.value = _uiState.value.copy(currentPhase = phase)

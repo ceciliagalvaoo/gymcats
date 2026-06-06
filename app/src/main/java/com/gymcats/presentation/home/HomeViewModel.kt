@@ -8,6 +8,7 @@ import com.gymcats.data.repository.CycleRepository
 import com.gymcats.data.repository.UserRepository
 import com.gymcats.data.repository.WorkoutRepository
 import com.gymcats.domain.model.CyclePhase
+import com.gymcats.domain.model.cyclePhaseTip
 import com.gymcats.domain.usecase.GetCyclePhaseUseCase
 import com.gymcats.util.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +23,7 @@ import javax.inject.Inject
 data class HomeUiState(
     val profile: UserProfile? = null,
     val currentPhase: CyclePhase? = null,
+    val phaseTip: String? = null,
     val workoutsThisMonth: Int = 0,
     val lastWorkout: Workout? = null,
     val isTodayCheckInDone: Boolean = false,
@@ -50,7 +52,7 @@ class HomeViewModel @Inject constructor(
             ) { profile, count, last, cycleLogs ->
                 val phase = profile?.let {
                     try {
-                        getCyclePhaseUseCase(LocalDate.parse(it.lastPeriodDate), it.cycleLength)
+                        getCyclePhaseUseCase(LocalDate.parse(it.lastPeriodDate), it.cycleLength, it.periodLength)
                     } catch (e: Exception) { null }
                 }
                 val warning = profile?.let {
@@ -63,6 +65,7 @@ class HomeViewModel @Inject constructor(
                 HomeUiState(
                     profile = profile,
                     currentPhase = phase,
+                    phaseTip = phase?.let { p -> profile?.goal?.let { g -> cyclePhaseTip(p, g) } },
                     workoutsThisMonth = count,
                     lastWorkout = last,
                     isTodayCheckInDone = todayCheckInDone,
